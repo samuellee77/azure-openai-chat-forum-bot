@@ -5,6 +5,7 @@ Welcome to the **Azure OpenAI Chat Forum Bot** repository! This project demonstr
 ## Table of Contents
 
 - [Introduction](#introduction)
+- [Structure](#structure)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
@@ -15,11 +16,11 @@ The Azure OpenAI Chat Forum Bot leverages the capabilities of OpenAI's language 
 
 ## Structure
 
-- `chat_bot/` contains the codes to add chat bot to a sample webpage
-- `data/` is the folder where you should store the data you want to add to the bot knowledge base
-- `forum_bot/` contains the codes to add autoresponder to your discourse website
+- `/chat_bot` contains the codes to add chat bot to a sample webpage
+- `/data` is the folder where you should store the data you want to add to the bot knowledge base
+- `/forum_bot` contains the codes to add autoresponder to your discourse website
 - `requirements.txt` have all the required packages listed
-- `scripts/` contains Python scripts which can prepare the data and upload it
+- `/scripts` contains Python scripts which can prepare the data and upload it
 
 ## Getting Started
 
@@ -29,6 +30,22 @@ Before you begin, ensure you have the following:
 
 - Azure account (with sufficient permissions to create and manage resources)
 - OpenAI API key
+
+You need to set the following environment variables:
+- AZURE_STORAGE_ACCOUNT
+- AZURE_STORAGE_CONTAINER
+- AZURE_SEARCH_SERVICE
+- AZURE_SEARCH_INDEX
+- AZURE_OPENAI_SERVICE
+- AZURE_OPENAI_KEY
+- AZURE_OPENAI_GPT_DEPLOYMENT
+- AZURE_OPENAI_CHATGPT_DEPLOYMENT
+- AZURE_OPENAI_CHATGPT_MODEL
+- AZURE_OPENAI_EMB_DEPLOYMENT (optional)
+- AZURE_KEY_CREDENTIAL
+- KB_FIELDS_CONTENT (optional)
+- KB_FIELDS_CATEGORY (optional)
+- KB_FIELDS_SOURCEPAGE (optional)
 
 ### Installation
 
@@ -48,3 +65,7 @@ pip install -r requirements.txt
 3. Configure the bot by adding your OpenAI API key and adjusting settings in the `config.js` file.
 
 4. Deploy the bot to Azure using your preferred deployment method (Azure CLI, Azure DevOps, etc.).
+
+5. Change Template
+
+6. On discourse -> have a webhook function set up
