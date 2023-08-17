@@ -1,7 +1,10 @@
 # azure-openai-chat-forum-bot
 
 ###### modified from [ChatGPT + Enterprise data with Azure OpenAI and Cognitive Search](https://github.com/Azure-Samples/azure-search-openai-demo/)
+
 Welcome to the **Azure OpenAI Chat Forum Bot** repository! This project demonstrates how to integrate OpenAI's powerful language model into a forum-based chatbot using Microsoft Azure services. The bot is designed to engage in natural and contextually relevant conversations with users on various topics within a forum setting.
+
+![Overview](/imgs/overview.png)
 
 ## Table of Contents
 
@@ -79,6 +82,6 @@ pip install -r requirements.txt
 
 4. Change the `.env_sample` to `.env` and set the environment variables mentioned above.
 
-5. Run `./scripts/prepdocs.sh`.
+5. Move the data (should be in .md format) you want to add into `./data`. Run `./scripts/prepdocs.sh`.
 
 6. Deploy to your web service.
