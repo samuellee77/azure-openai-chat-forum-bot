@@ -9,21 +9,21 @@ from azure.search.documents import SearchClient
 from approaches.retrievethenread import RetrieveThenReadApproach
 from azure.core.credentials import AzureKeyCredential
 
-AZURE_STORAGE_ACCOUNT = os.getenv("AZURE_STORAGE_ACCOUNT", "mystorageaccount")
-AZURE_STORAGE_CONTAINER = os.getenv("AZURE_STORAGE_CONTAINER", "content")
-AZURE_SEARCH_SERVICE = os.getenv("AZURE_SEARCH_SERVICE", "gptkb")
-AZURE_SEARCH_INDEX = os.getenv("AZURE_SEARCH_INDEX", "gptkbindex")
-AZURE_OPENAI_SERVICE = os.getenv("AZURE_OPENAI_SERVICE", "myopenai")
+AZURE_SEARCH_SERVICE = os.getenv("AZURE_SEARCH_SERVICE")
+AZURE_SEARCH_INDEX = os.getenv("AZURE_SEARCH_INDEX")
+AZURE_OPENAI_SERVICE = os.getenv("AZURE_OPENAI_SERVICE")
 AZURE_OPENAI_KEY = os.getenv("AZURE_OPENAI_KEY")
-AZURE_OPENAI_CHATGPT_DEPLOYMENT = os.getenv("AZURE_OPENAI_CHATGPT_DEPLOYMENT", "chat")
+AZURE_OPENAI_CHATGPT_DEPLOYMENT = os.getenv("AZURE_OPENAI_CHATGPT_DEPLOYMENT")
 AZURE_OPENAI_CHATGPT_MODEL = os.getenv("AZURE_OPENAI_CHATGPT_MODEL", "gpt-35-turbo")
 AZURE_KEY_CREDENTIAL = os.getenv("AZURE_KEY_CREDENTIAL")
+FORUM_USERNAME = os.getenv("FORUM_USERNAME")
+FORUM_API_KEY = os.getenv("FORUM_API_KEY")
 KB_FIELDS_CONTENT = os.getenv("KB_FIELDS_CONTENT", "content")
 KB_FIELDS_CATEGORY = os.getenv("KB_FIELDS_CATEGORY", "category")
 KB_FIELDS_SOURCEPAGE = os.getenv("KB_FIELDS_SOURCEPAGE", "sourcepage")
 
 azure_credential = DefaultAzureCredential(exclude_shared_token_cache_credential = True)
-credential = AzureKeyCredential("LyzT0JrjvpbPbHmeiJuZN0TLpRZzS80kRH7ZoLX7WLAzSeBhpG5z")
+credential = AzureKeyCredential(AZURE_KEY_CREDENTIAL)
 
 openai.api_base = f"https://{AZURE_OPENAI_SERVICE}.openai.azure.com"
 openai.api_version = "2023-05-15"
@@ -59,11 +59,13 @@ def webhook():
         dont_know_message = "Sorry, I cannot answer this question based on my data sources. Please wait for our experts to answer your question.\nThank You."
         answer = r.json.get('answer') if not r.json.get('answer').lower() == "false" else dont_know_message
         # next step: post directly to the forum
-        forum_response = requests.post(f"{forum_domain}/posts.json", headers={"Api-Key": "6c6cd09a35c91be0a10d5942eba8a12d33bde71ed992c1729f8c435857d3e2c1",
-                                "Api-Username": "AdvanBot"},
+        forum_response = requests.post(f"{forum_domain}/posts.json", headers={"Api-Key": FORUM_API_KEY, "Api-Username": FORUM_USERNAME},
                                 json={"raw": f"{opening}\n\n{answer}\n\n{disclaimer}",
                                 "topic_id": topic_id})
-        return jsonify(success=True), 200
+        if forum_response.status_code == 200:
+            return jsonify(success=True), 200
+        else:
+            raise Exception(forum_response.json().get('error'))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -72,7 +74,6 @@ def retrieve():
     forum_domain = request.json.get('forum_domain')
     topic_id = request.json.get('topic_id')
     reply_nums = request.json.get('reply_nums')
-    print("hahahah!")
     received = requests.get(f"{forum_domain}/t/{topic_id}.json", headers={"Content-Type": "application/json"})
     if (received.status_code == 404):
         return jsonify({'error': 'the requested topic could not be found.'}), 404
