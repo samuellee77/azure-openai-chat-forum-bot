@@ -1,8 +1,8 @@
-# azure-openai-chat-forum-bot
+# Forum Bot & Chat Bot with Azure OpenAI
 
 ###### modified from [ChatGPT + Enterprise data with Azure OpenAI and Cognitive Search](https://github.com/Azure-Samples/azure-search-openai-demo/)
 
-Welcome to the **Azure OpenAI Chat Forum Bot** repository! This project demonstrates how to integrate OpenAI's powerful language model into a forum-based chatbot using Microsoft Azure services. The bot is designed to engage in natural and contextually relevant conversations with users on various topics within a forum setting.
+Welcome to the **Azure OpenAI Chat Forum Bot** repository! This project demonstrates how to integrate OpenAI's powerful language model into a Discourse-based auto reply bot and a web chatbot using Microsoft Azure services. 
 
 ![Overview](/imgs/overview.png)
 
@@ -13,18 +13,22 @@ Welcome to the **Azure OpenAI Chat Forum Bot** repository! This project demonstr
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+    - [Prepare Data (upload)](#prepare-data-upload)
+    - [Forum Bot](#forum-bot)
+    - [Chat Bot](#chat-bot)
+- [Resources](#resources)
 
 ## Introduction
 
-The Azure OpenAI Chat Forum Bot leverages the capabilities of OpenAI's language model to create an interactive and engaging forum bot. With this bot, you can provide an enhanced user experience within your forum community by enabling dynamic and relevant discussions. Whether you're looking to add a touch of AI-powered assistance or spark insightful conversations, this bot has got you covered.
+The Azure OpenAI Chat Forum Bot leverages the capabilities of OpenAI's language model to create an interactive and engaging forum bot. With this bot, you can provide an enhanced user experience within your forum community by enabling dynamic and relevant discussions. This repository contains two parts, which are forum bot (on Discourse) and chat bot (on website).
 
 ## Structure
 
-- `/chat_bot` contains the codes to add chat bot to a sample webpage
-- `/data` is the folder where you should store the data you want to add to the bot knowledge base
-- `/forum_bot` contains the codes to add autoresponder to your discourse website
+- `./chat_bot` contains the codes to add chat bot to a sample webpage
+- `./data` is the folder where you should store the data you want to add to the bot knowledge base
+- `./forum_bot` contains the codes to add autoresponder to your discourse website
 - `requirements.txt` have all the required packages listed
-- `/scripts` contains Python scripts which can prepare the data and upload it
+- `./scripts` contains Python scripts which can prepare the data and upload it
 
 ## Getting Started
 
@@ -61,27 +65,49 @@ You need to set the following environment variables in `./scripts/.env`:
 
 ### Installation
 
-1. Clone this repository to your local machine:
+Clone this repository to your local machine:
 
 ```bash
 git clone https://github.com/samuellee77/azure-openai-chat-forum-bot.git
 cd azure-openai-chat-forum-bot
 ```
 
-2. Install the required dependencies:
+#### Prepare Data (upload)
+
+1. Install the required dependencies:
 
 ```bash
+cd scripts
 pip install -r requirements.txt
 ```
 
-3. You need to have an admin user on your Discourse forum. You have to get your API key and username, and you also need to setup webhooks:
+2. Change the `.env_sample` to `.env` and set the environment variables mentioned above.
+
+3. Move the data (should be in .md format) you want to add into `./data`. Run:
+```bash
+sh prepdocs.sh
+```
+
+#### Forum Bot
+
+1. Install the required dependencies:
+
+```bash
+cd forum_bot
+pip install -r requirements.txt
+```
+
+2. You need to have an admin user on your Discourse forum. You have to get your API key and username, and you also need to setup webhooks:
   - To get an API key, follow this [guide](https://meta.discourse.org/t/create-and-configure-an-api-key/230124)
   - To set up webhook, follow this [guide](https://meta.discourse.org/t/configure-webhooks-that-trigger-on-discourse-events-to-integrate-with-external-services/49045)
     - Payload URL: the web domain of your web service
     - Select individual event -> Topic Event
 
-4. Change the `.env_sample` to `.env` and set the environment variables mentioned above.
+3. Deploy to your web service.
 
-5. Move the data (should be in .md format) you want to add into `./data`. Run `./scripts/prepdocs.sh`.
+#### Chat Bot
 
-6. Deploy to your web service.
+## Resources
+
+- [Azure Search OpenAI Demo](https://github.com/Azure-Samples/azure-search-openai-demo)
+- [Discourse API](https://docs.discourse.org)
