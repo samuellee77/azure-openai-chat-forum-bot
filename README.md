@@ -45,11 +45,8 @@ Before you begin, ensure you have the following:
 
 You also need to manually creates Azure Web Service, Azure OpenAI Service, and Azure Cognitive Search Service. If you don't have any pre-existing Azure services, create those services [here](https://portal.azure.com) and follow the guides:
   - [Azure Web Service](https://learn.microsoft.com/en-us/azure/app-service/quickstart-python?tabs=flask%2Cwindows%2Cazure-cli%2Cvscode-deploy%2Cdeploy-instructions-azportal%2Cterminal-bash%2Cdeploy-instructions-zip-azcli)
-
   - [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal)
-
   - [Azure Cognitive Search](https://learn.microsoft.com/en-us/azure/search/search-get-started-portal)
-
     - AZURE_KEY_CREDENTIAL can be found under your Search Service -> Settings -> Keys -> Primary admin key
 
 You need to set the following environment variables in `./scripts/.env`:
@@ -89,8 +86,8 @@ pip install -r requirements.txt
 ```bash
 python download_page.py --url {target_url} --folder {folder_path} --type 'wiki'
 ```
-
-  **Tips**: You can write a simple shell script to automatically download all urls you want at once
+  - **Note:** Remember to fill in correct url and folder path in the shell command
+  - **Tips:** You can write a simple shell script to automatically download all urls you want at once
 
 3. Change the `.env_sample` to `.env` and set the environment variables mentioned above.
 
@@ -108,11 +105,10 @@ pip install -r requirements.txt
 ```
 
 2. You need to have an admin user on your Discourse forum. You have to get your API key and username, and you also need to setup webhooks:
-  - To get an API key, follow this [guide](https://meta.discourse.org/t/create-and-configure-an-api-key/230124)
-  - To set up webhook, follow this [guide](https://meta.discourse.org/t/configure-webhooks-that-trigger-on-discourse-events-to-integrate-with-external-services/49045)
-    - Payload URL: the web domain of your web service
-    - Select individual event -> Topic Event
-
+    - To get an API key, follow this [guide](https://meta.discourse.org/t/create-and-configure-an-api-key/230124)
+    - To set up webhook, follow this [guide](https://meta.discourse.org/t/configure-webhooks-that-trigger-on-discourse-events-to-integrate-with-external-services/49045)
+        - Payload URL: the web domain of your web service
+        - Select individual event -> Topic Event
 3. Deploy to your web service. (using Azure CLI, GitHub, local Git, etc.)
 ---
 
