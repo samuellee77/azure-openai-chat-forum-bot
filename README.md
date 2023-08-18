@@ -87,7 +87,7 @@ pip install -r requirements.txt
 python download_page.py --url {the url you want to download} --folder {download location} --type 'wiki'
 ```
 
-	* **Tips**: You can write a simple shell script to automatically download all urls you want at once
+  **Tips**: You can write a simple shell script to automatically download all urls you want at once
 
 3. Change the `.env_sample` to `.env` and set the environment variables mentioned above.
 
@@ -99,7 +99,7 @@ sh prepdocs.sh
 #### Forum Bot
 
 1. Install the required dependencies:
-```bash=
+```bash
 cd forum_bot
 pip install -r requirements.txt
 ```
