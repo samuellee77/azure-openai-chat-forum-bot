@@ -1,12 +1,11 @@
 import os
 import requests 
 import openai
-import markdown
 from utils import *
 from flask import Flask, request, jsonify
 from azure.identity import DefaultAzureCredential
 from azure.search.documents import SearchClient
-from approaches.retrievethenread import RetrieveThenReadApproach
+from retrievethenread import RetrieveThenReadApproach
 from azure.core.credentials import AzureKeyCredential
 
 AZURE_SEARCH_SERVICE = os.getenv("AZURE_SEARCH_SERVICE")
@@ -68,38 +67,6 @@ def webhook():
             raise Exception(forum_response.json().get('error'))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@app.route("/retrieve", methods=["GET"])
-def retrieve():
-    forum_domain = request.json.get('forum_domain')
-    topic_id = request.json.get('topic_id')
-    reply_nums = request.json.get('reply_nums')
-    received = requests.get(f"{forum_domain}/t/{topic_id}.json", headers={"Content-Type": "application/json"})
-    if (received.status_code == 404):
-        return jsonify({'error': 'the requested topic could not be found.'}), 404
-    title = remove_html_tags(received.json().get('title'))
-    question = remove_html_tags(received.json().get('post_stream').get('posts')[0].get('cooked'))
-    opening = "The following is the auto reply by GPT bot:"
-    disclaimer = "*Note: Please remind that this auto reply might not be accurate. If you have any more questions, please reply to this post."
-
-    # check if all reply num exist
-    if request.json.get('get_all'):
-        replies_posts = received.json().get('post_stream').get('posts')[1:]
-    else:
-        if (any([x >= len(received.json().get('post_stream').get('posts')) for x in reply_nums])):
-            return jsonify({'error': "IndexError: list index out of range"}), 500
-        replies_posts =  list(map(lambda x: received.json().get('post_stream').get('posts')[x], reply_nums))
-    replies_content = list(map(lambda x: remove_html_tags(x.get('cooked').replace(opening, "").replace(disclaimer, "")), replies_posts))
-        
-    md = \
-f"""# {title}
-## Question:
-{question}
-## Replies:
-""" + "\n\n---\n".join(replies_content)
-    html = markdown.markdown(md)
-    results = {"title": title, "question": question, "replies": replies_posts, "markdown": md, "html": html, "success": True}
-    return jsonify(results), 200
 
 if __name__ == '__main__':  
     app.run() 

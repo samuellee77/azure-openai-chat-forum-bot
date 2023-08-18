@@ -81,9 +81,16 @@ cd scripts
 pip install -r requirements.txt
 ```
 
-2. Change the `.env_sample` to `.env` and set the environment variables mentioned above.
+2. If you want to download new data from wiki, forum, or other websites, you can run the following sample code:
 
-3. Move the data (should be in .md format) you want to add into `./data`. Run:
+```bash
+python download_page.py --url {the url you want to download} --folder {download location} --type 'wiki'
+```
+* **Tips**: You can write a simple shell script to automatically download all urls you want at once
+
+3. Change the `.env_sample` to `.env` and set the environment variables mentioned above.
+
+4. Move the data (should be in .md format) you want to add into `./data`. Then, run:
 ```bash
 sh prepdocs.sh
 ```
@@ -103,7 +110,7 @@ pip install -r requirements.txt
     - Payload URL: the web domain of your web service
     - Select individual event -> Topic Event
 
-3. Deploy to your web service.
+3. Deploy to your web service. (using Azure CLI, GitHub, local Git, etc.)
 
 #### Chat Bot
 
