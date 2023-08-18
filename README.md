@@ -37,17 +37,20 @@ The Azure OpenAI Chat Forum Bot leverages the capabilities of OpenAI's language 
 Before you begin, ensure you have the following:
 
 - Python 3.9+
-  - Important: Python and the pip package manager must be in the path in Windows for the setup scripts to work.
+  - **Notice:** Python and the pip package manager must be in the path in Windows for the setup scripts to work.
 - Git
 - Azure account (with sufficient permissions to create and manage resources)
 - Azure Developer CLI
 - OpenAI API key
 
-You also need to manually creates Azure Web Service, Azure OpenAI Service, and Azure Cognitive Search Service. If you don't have any pre-existing Azure services, create those services [here](https://portal.azure.com) and follow the guides
+You also need to manually creates Azure Web Service, Azure OpenAI Service, and Azure Cognitive Search Service. If you don't have any pre-existing Azure services, create those services [here](https://portal.azure.com) and follow the guides:
   - [Azure Web Service](https://learn.microsoft.com/en-us/azure/app-service/quickstart-python?tabs=flask%2Cwindows%2Cazure-cli%2Cvscode-deploy%2Cdeploy-instructions-azportal%2Cterminal-bash%2Cdeploy-instructions-zip-azcli)
+
   - [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal)
+
   - [Azure Cognitive Search](https://learn.microsoft.com/en-us/azure/search/search-get-started-portal)
-    - AZURE_KEY_CREDENTIAL can be found under your search service -> Settings -> Keys -> Primary admin key
+
+    - AZURE_KEY_CREDENTIAL can be found under your Search Service -> Settings -> Keys -> Primary admin key
 
 You need to set the following environment variables in `./scripts/.env`:
 - AZURE_SEARCH_SERVICE
@@ -84,7 +87,7 @@ pip install -r requirements.txt
 
 2. If you want to download new data from wiki, forum, or other websites, you can run the following sample code:
 ```bash
-python download_page.py --url {the url you want to download} --folder {download location} --type 'wiki'
+python download_page.py --url {target_url} --folder {folder_path} --type 'wiki'
 ```
 
   **Tips**: You can write a simple shell script to automatically download all urls you want at once
