@@ -63,30 +63,31 @@ You need to set the following environment variables in `./scripts/.env`:
 - FORUM_USERNAME
 - FORUM_API_KEY
 
+---
+
 ### Installation
 
 Clone this repository to your local machine:
-
 ```bash
 git clone https://github.com/samuellee77/azure-openai-chat-forum-bot.git
 cd azure-openai-chat-forum-bot
 ```
 
+---
 #### Prepare Data (upload)
 
 1. Install the required dependencies:
-
 ```bash
 cd scripts
 pip install -r requirements.txt
 ```
 
 2. If you want to download new data from wiki, forum, or other websites, you can run the following sample code:
-
 ```bash
 python download_page.py --url {the url you want to download} --folder {download location} --type 'wiki'
 ```
-* **Tips**: You can write a simple shell script to automatically download all urls you want at once
+
+	* **Tips**: You can write a simple shell script to automatically download all urls you want at once
 
 3. Change the `.env_sample` to `.env` and set the environment variables mentioned above.
 
@@ -94,12 +95,11 @@ python download_page.py --url {the url you want to download} --folder {download 
 ```bash
 sh prepdocs.sh
 ```
-
+---
 #### Forum Bot
 
 1. Install the required dependencies:
-
-```bash
+```bash=
 cd forum_bot
 pip install -r requirements.txt
 ```
@@ -111,6 +111,7 @@ pip install -r requirements.txt
     - Select individual event -> Topic Event
 
 3. Deploy to your web service. (using Azure CLI, GitHub, local Git, etc.)
+---
 
 #### Chat Bot
 
