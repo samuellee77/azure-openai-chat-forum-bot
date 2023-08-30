@@ -1,7 +1,6 @@
 import argparse
 import base64
 import glob
-import html
 import os
 import re
 import time
@@ -64,21 +63,6 @@ def remove_blobs(filename):
 
         if count == 0:
             if args.verbose: print(f"\tNo blobs found, please check the filename or remove the file from the search index manually")
-
-def table_to_html(table):
-    table_html = "<table>"
-    rows = [sorted([cell for cell in table.cells if cell.row_index == i], key=lambda cell: cell.column_index) for i in range(table.row_count)]
-    for row_cells in rows:
-        table_html += "<tr>"
-        for cell in row_cells:
-            tag = "th" if (cell.kind == "columnHeader" or cell.kind == "rowHeader") else "td"
-            cell_spans = ""
-            if cell.column_span > 1: cell_spans += f" colSpan={cell.column_span}"
-            if cell.row_span > 1: cell_spans += f" rowSpan={cell.row_span}"
-            table_html += f"<{tag}{cell_spans}>{html.escape(cell.content)}</{tag}>"
-        table_html +="</tr>"
-    table_html += "</table>"
-    return table_html
 
 def get_document_text(filename: str, remove_img: bool, remove_href: bool) -> str | None:
     if filename.endswith(".md"):
@@ -188,7 +172,6 @@ def remove_from_index(filename):
         if args.verbose: print(f"\tRemoved {len(r)} sections from index")
         # It can take a few seconds for search results to reflect changes, so wait a bit
         time.sleep(2)
-
 
 if __name__ == "__main__":
 

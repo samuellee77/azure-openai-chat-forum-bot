@@ -9,6 +9,7 @@ from retrievethenread import RetrieveThenReadApproach
 from azure.core.credentials import AzureKeyCredential
 from azure.storage.blob import BlobServiceClient
 
+# environment variables
 AZURE_STORAGE_ACCOUNT = os.getenv("AZURE_STORAGE_ACCOUNT")
 AZURE_STORAGE_CONTAINER = os.getenv("AZURE_STORAGE_CONTAINER")
 AZURE_STORAGE_KEY = os.getenv("AZURE_STORAGE_KEY")
@@ -39,18 +40,18 @@ search_client = SearchClient(
     endpoint=f"https://{AZURE_SEARCH_SERVICE}.search.windows.net",
     index_name=AZURE_SEARCH_INDEX,
     credential=credential)
-
 blob_client = BlobServiceClient(
     account_url=f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net", 
     credential=AZURE_STORAGE_KEY)
 blob_container = blob_client.get_container_client(AZURE_STORAGE_CONTAINER)
 
+# Function to get blob data
 def get_blob(blob_name):
     try:
         # Get a reference to the blob
         blob_client = blob_container.get_blob_client(blob_name[:blob_name.rfind('.')] + ".pdf")
         if blob_client.exists():
-        # Download the blob to a local file
+            # Download the blob to a local file
             blob_data = blob_client.download_blob()
             return blob_data, "pdf"
         else:
@@ -62,7 +63,7 @@ def get_blob(blob_name):
         print(str(e))
         return
 
-# Function to upload a file and get the URL
+# Function to upload a file to forum and get the URL
 def upload_file(blob_name):
     url = f"{FORUM_URL}/uploads.json"
     headers = {
@@ -70,6 +71,7 @@ def upload_file(blob_name):
         "Api-Username": FORUM_API_USERNAME,
     }
     content, mime_type = get_blob(blob_name)
+    # upload with different data type
     if mime_type == "pdf":
         response = requests.post(url,
                   files = {'files[]': (blob_name[:blob_name.rfind('.')] + ".pdf", content, 'application/pdf')},
@@ -94,19 +96,26 @@ def index():
 
 @app.route('/webhook', methods=['POST'])  
 def webhook():
+    # check if the event is 'topic_created'
     if not request.headers.get('X-Discourse-Event') == "topic_created":
         return jsonify(success=False), 403
     forum_domain = request.headers.get('X-Discourse-Instance')
+    # get topic id, title, and content 
     topic_id = request.json["topic"]["id"]
     received = requests.get(f"{forum_domain}/t/{topic_id}.json").json().get("post_stream").get("posts")[0]
     topic_title = received.get("topic_slug").replace("-", " ")
     topic_content = received.get("cooked")
     try:
+        # send the content to openai model
         impl = RetrieveThenReadApproach(search_client, AZURE_OPENAI_CHATGPT_DEPLOYMENT, AZURE_OPENAI_CHATGPT_MODEL, KB_FIELDS_SOURCEFILE, KB_FIELDS_CONTENT)
         r = jsonify(impl.run(f"Title: {topic_title}\n{topic_content}", {}))
+        
+        # get referred data sources and upload to forum
         data_sources = list(map(lambda x : x.split(":")[0], r.json.get("data_points")))
         upload_urls = {x: upload_file(x) for x in data_sources}
         file_urls = [f"<a target='_blank' rel='noopener' href='{upload_urls[source]}'>{source[:source.rfind('.')]}</a>" for source in upload_urls if upload_urls[source]]
+        
+        # construct reply post
         md = """References:\n\n""" + "\n".join(file_urls)
         opening = "The following is the auto reply by GPT bot:"
         disclaimer = "*Note: Please remind that this auto reply might not be accurate. If you have any more questions, please reply to this post."
@@ -114,9 +123,9 @@ def webhook():
         answer = r.json.get('answer') if not r.json.get('answer').lower() == "false" else dont_know_message
         payload = {"raw": f"{opening}\n\n{answer}\n\n{md}\n\n{disclaimer}", "topic_id": topic_id} if not r.json.get('answer').lower() == "false" \
             else {"raw": f"{opening}\n\n{answer}\n\n{disclaimer}", "topic_id": topic_id}
-        # next step: post directly to the forum
-        forum_response = requests.post(f"{forum_domain}/posts.json", headers={"Api-Key": FORUM_API_KEY, "Api-Username": FORUM_API_USERNAME},
-                                json=payload)
+        
+        # post directly to the forum
+        forum_response = requests.post(f"{forum_domain}/posts.json", headers={"Api-Key": FORUM_API_KEY, "Api-Username": FORUM_API_USERNAME},json=payload)
         return jsonify(success=True), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
