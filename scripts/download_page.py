@@ -1,4 +1,8 @@
-import requests, os, argparse
+import os
+import re
+import argparse
+import markdown
+import requests
 from bs4 import BeautifulSoup, Comment
 from markdownify import markdownify
 
@@ -90,18 +94,34 @@ def download_whole_page(url: str):
     open(f'{file_path}{url.split("/")[-1]}.md', 'w', encoding='utf-8').write(md)
     open(f'{file_path}{url.split("/")[-1]}.html', 'w', encoding='utf-8').write(utf_8 + soup.prettify())
 
+def remove_html_tags(text_with_tags):
+    clean_text = re.sub(r'<.*?>', '', text_with_tags)
+    return clean_text
+
 def download_forum(url: str):
     forum_domain = "https:/"+"/".join(url.split("/")[1:3])
     topic_id = url.split("/")[-1]
-    api_content = {
-        "forum_domain": forum_domain,
-        "topic_id": topic_id,
-        "reply_nums" : [],
-        "get_all": True
-    }
-    response = requests.get("https://adventech-webhook.azurewebsites.net/retrieve", json=api_content)
-    open(f'{file_path}{url.split("/")[-2]}.md', 'w', encoding='utf-8').write(response.json().get('markdown'))
-    open(f'{file_path}{url.split("/")[-2]}.html', 'w', encoding='utf-8').write(utf_8 + response.json().get('html'))
+    try:
+        received = requests.get(f"{forum_domain}/t/{topic_id}.json", headers={"Content-Type": "application/json"})
+        if (received.status_code == 404):
+            raise Exception("The requested resource not Found")
+        title = remove_html_tags(received.json().get('title'))
+        question = remove_html_tags(received.json().get('post_stream').get('posts')[0].get('cooked'))
+        opening = "The following is the auto reply by GPT bot:"
+        disclaimer = "*Note: Please remind that this auto reply might not be accurate. If you have any more questions, please reply to this post."
+        replies_posts = received.json().get('post_stream').get('posts')[1:]
+        replies_content = list(map(lambda x: remove_html_tags(x.get('cooked').replace(opening, "").replace(disclaimer, "")), replies_posts))
+        md = \
+    f"""# {title}
+    ## Question:
+    {question}
+    ## Replies:
+    """ + "\n\n---\n".join(replies_content)
+        html = markdown.markdown(md)
+        open(f'{file_path}{url.split("/")[-2]}.md', 'w', encoding='utf-8').write(md)
+        open(f'{file_path}{url.split("/")[-2]}.html', 'w', encoding='utf-8').write(html)
+    except Exception as e:
+        print(f"Failed to download {url}:\n{e}")
 
 
 if __name__ == "__main__":
