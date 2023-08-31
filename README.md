@@ -1,5 +1,11 @@
 # Forum Bot & Chat Bot with Azure OpenAI
 
+> If you want to clone this repository, please use:
+> ```bash
+> git clone --recurse-submodules <url>
+> ```
+> Remember to add `--recurse-submodules` while cloning.
+
 ###### modified from [ChatGPT + Enterprise data with Azure OpenAI and Cognitive Search](https://github.com/Azure-Samples/azure-search-openai-demo/)
 
 Welcome to the **Azure OpenAI Chat Forum Bot** repository! This project demonstrates how to integrate OpenAI's powerful language model into a Discourse-based auto reply bot and a web chatbot using Microsoft Azure services. 

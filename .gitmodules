@@ -1,0 +1,6 @@
+[submodule "chat_bot/backend"]
+	path = chat_bot/backend
+	url = https://github.com/shuxian12/chatbot_api.git
+[submodule "chat_bot/frontend"]
+	path = chat_bot/frontend
+	url = https://github.com/shuxian12/chatbot_frontend.git
