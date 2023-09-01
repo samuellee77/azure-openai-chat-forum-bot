@@ -62,12 +62,13 @@ You need to set the following environment variables in `./scripts/.env`:
 - AZURE_OPENAI_KEY
 - AZURE_OPENAI_CHATGPT_DEPLOYMENT
 - AZURE_OPENAI_CHATGPT_MODEL (need to be gpt-35-turbo or gpt-4)
-- AZURE_KEY_CREDENTIAL
+- AZURE_SEARCH_KEY
 - KB_FIELDS_CONTENT (optional)
 - KB_FIELDS_CATEGORY (optional)
 - KB_FIELDS_SOURCEPAGE (optional)
-- FORUM_USERNAME
+- FORUM_API_USERNAME
 - FORUM_API_KEY
+- FORUM_URL
 
 ---
 
@@ -84,41 +85,45 @@ cd azure-openai-chat-forum-bot
 
 1. Install the required dependencies:
 ```bash
-cd scripts
 pip install -r requirements.txt
 ```
 
-2. If you want to download new data from wiki, forum, or other websites, you can run the following sample code:
+2. Change th environment variables in `set_env.sh` (in local) and run the following code:
 ```bash
-python download_page.py --url {target_url} --folder {folder_path} --type 'wiki'
+source set_env.sh
+```
+
+3. If you want to download new data from wiki, forum, or other websites, you can run the following sample code:
+- Download single page:
+```bash
+cd scripts
+python download_single_page.py --url {target_url} --folder {folder_path} --type 'wiki'
+```
+- Download whole forum topics (you need to change `url` variable in the script):
+```bash
+python forum_scraper.py
+```
+- Download wiki data:
+```bash
+python download_wiki --url {root_url} --folder {folder_path}
 ```
   - **Note:** Remember to fill in correct url and folder path in the shell command
   - **Tips:** You can write a simple shell script to automatically download all urls you want at once
 
-3. Change the `.env_sample` to `.env` and set the environment variables mentioned above.
-
-4. Move the data (should be in .md format) you want to add into `./data`. Then, run:
+4. Move the data (should be in .md format) you want to add into `./data`. Then, run the following code to upload blob and index:
 ```bash
 sh prepdocs.sh
 ```
 ---
 #### Forum Bot
 
-1. Install the required dependencies:
-```bash
-cd forum_bot
-pip install -r requirements.txt
-```
-
-2. You need to have an admin user on your Discourse forum. You have to get your API key and username, and you also need to setup webhooks:
+1. You need to have an admin user on your Discourse forum. You have to get your API key and username, and you also need to setup webhooks:
     - To get an API key, follow this [guide](https://meta.discourse.org/t/create-and-configure-an-api-key/230124)
     - To set up webhook, follow this [guide](https://meta.discourse.org/t/configure-webhooks-that-trigger-on-discourse-events-to-integrate-with-external-services/49045)
         - Payload URL: the web domain of your web service
         - Select individual event -> Topic Event
-3. Deploy to your web service. (using Azure CLI, GitHub, local Git, etc.)
+2. Deploy to your web service. (using Azure CLI, GitHub, local Git, etc.)
 ---
-
-#### Chat Bot
 
 ## Resources
 

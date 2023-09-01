@@ -19,8 +19,8 @@ AZURE_OPENAI_SERVICE = os.getenv("AZURE_OPENAI_SERVICE")
 AZURE_OPENAI_KEY = os.getenv("AZURE_OPENAI_KEY")
 AZURE_OPENAI_CHATGPT_DEPLOYMENT = os.getenv("AZURE_OPENAI_CHATGPT_DEPLOYMENT")
 AZURE_OPENAI_CHATGPT_MODEL = os.getenv("AZURE_OPENAI_CHATGPT_MODEL", "gpt-35-turbo")
-AZURE_KEY_CREDENTIAL = os.getenv("AZURE_KEY_CREDENTIAL")
-FORUM_API_USERNAME = os.getenv("FORUM_USERNAME")
+AZURE_SEARCH_KEY = os.getenv("AZURE_SEARCH_KEY")
+FORUM_API_USERNAME = os.getenv("FORUM_API_USERNAME")
 FORUM_API_KEY = os.getenv("FORUM_API_KEY")
 FORUM_URL = os.getenv("FORUM_URL")
 KB_FIELDS_CONTENT = os.getenv("KB_FIELDS_CONTENT", "content")
@@ -28,7 +28,7 @@ KB_FIELDS_CATEGORY = os.getenv("KB_FIELDS_CATEGORY", "category")
 KB_FIELDS_SOURCEFILE = os.getenv("KB_FIELDS_SOURCEFILE", "sourcefile")
 
 azure_credential = DefaultAzureCredential(exclude_shared_token_cache_credential = True)
-credential = AzureKeyCredential(AZURE_KEY_CREDENTIAL)
+credential = AzureKeyCredential(AZURE_SEARCH_KEY)
 
 openai.api_base = f"https://{AZURE_OPENAI_SERVICE}.openai.azure.com"
 openai.api_version = "2023-05-15"

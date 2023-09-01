@@ -1,0 +1,18 @@
+#!/bin/sh
+
+export 'AZURE_STORAGE_ACCOUNT=abc'
+export 'AZURE_STORAGE_CONTAINER=abc'
+export 'AZURE_STORAGE_KEY=abc'
+export 'AZURE_SEARCH_SERVICE=abc'
+export 'AZURE_SEARCH_INDEX=index'
+export 'AZURE_SEARCH_KEY=abc'
+export 'AZURE_OPENAI_SERVICE=abc'
+export 'AZURE_OPENAI_KEY=abc'
+export 'AZURE_OPENAI_CHATGPT_DEPLOYMENT=chat'
+export 'AZURE_OPENAI_CHATGPT_MODEL=gpt-35-turbo'
+export 'KB_FIELDS_CONTENT=content'
+export 'KB_FIELDS_CATEGORY=category'
+export 'KB_FIELDS_SOURCEFILE=sourcefile'
+export 'FORUM_API_USERNAME=bot'
+export 'FORUM_API_KEY=abc'
+export 'FORUM_URL=abc'
