@@ -23,8 +23,8 @@ from azure.storage.blob import BlobServiceClient
 from text_spliter import split_md
 
 MAX_SECTION_LENGTH = 1000
-SENTENCE_SEARCH_LIMIT = 100
-SECTION_OVERLAP = 100
+# SENTENCE_SEARCH_LIMIT = 100
+# SECTION_OVERLAP = 100
 
 def blob_name_from_file_page(filename, page = 0):
     if os.path.splitext(filename)[1].lower() == ".pdf":
@@ -79,7 +79,7 @@ def get_document_text(filename: str, remove_img: bool, remove_href: bool) -> str
         if remove_img:
             doc = re.sub(r"!\[.*\]\(.*\)", "", doc)
         if remove_href:
-            doc = re.sub(r"(?<!!)\[.*\]\(.*\)", "", doc)  
+            doc = re.sub(r"\[(.*)\]\(.*\)", "\\1", doc)
         return doc
     else:
         raise Exception(f"File type not supported, {filename}")
@@ -94,17 +94,20 @@ def create_sections(filename:str, page_map: str) -> dict:
 
     if filename.endswith(".md"):
         for i, doc in enumerate(split_md(page_map, filename)):
-            section = {
-                "id": f"{file_id}-page-{i}",
-                "title": os.path.splitext(filename)[0],
-                "content": doc['content'],
-                "category": args.category,
-                "sourcepage": blob_name_from_file_page(filename, i),
-                "sourcefile": filename,
-                "headings": doc['heading'],# json.dumps(doc['heading'], ensure_ascii=False)
-                "markdown": doc['markdown'].replace('[toc]\n', '').replace('\n\n', '\n')
-            }
-            yield section
+            try:
+                section = {
+                    "id": f"{file_id}-page-{i}",
+                    "title": os.path.splitext(filename)[0],
+                    "content": doc['content'],
+                    "category": args.category,
+                    "sourcepage": blob_name_from_file_page(filename, i),
+                    "sourcefile": filename,
+                    "headings": doc['heading'],# json.dumps(doc['heading'], ensure_ascii=False)
+                    "markdown": doc['markdown'].replace('[toc]\n', '').replace('\n\n', '\n')
+                }
+                yield section
+            except Exception as e:
+                print(str(e))
     else:
         raise Exception(f"File type not supported, {filename}")
 
@@ -177,7 +180,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Prepare documents by extracting content from Markdowns, splitting content into sections, uploading to blob storage(optional), and indexing in a search index.",
-        epilog="Example 1: prepdocs.py '..\data\*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index myindex -v\nExample 2: prepdocs.py '../md/*' --searchservice 'mysearch' --index 'myindex' --tenantid 'mytenantid' --searchkey 'mysearchkey' --skipblobs --remove_image -v"
+        epilog="Example 1: prepdocs.py '../data/*' --storageaccount myaccount --container mycontainer --searchservice mysearch --index myindex -v\nExample 2: prepdocs.py '../md/*' --searchservice 'mysearch' --index 'myindex' --tenantid 'mytenantid' --searchkey 'mysearchkey' --skipblobs --remove_image -v"
         )
     parser.add_argument("files", help="Files to be processed")
     parser.add_argument("--category", help="Value for the category field in the search index for all sections indexed in this run")
@@ -219,8 +222,9 @@ if __name__ == "__main__":
         if not args.remove:
             create_search_index()
         
+        if args.verbose: print(f"* Total have {len(glob.glob(args.files))} files to process")
+
         print(f"Processing files...")
-        count = 1
         for filename in glob.glob(args.files)[:]:
             if args.verbose: print(f"Processing '{filename}'")
             if args.remove:
@@ -236,8 +240,8 @@ if __name__ == "__main__":
                 page_map = get_document_text(filename, args.remove_image, args.remove_href)
                 sections = create_sections(os.path.basename(filename), page_map)
                 if args.test:
-                    with open(f'test/md_{count}.json', 'w', encoding='utf-8') as f:
+                    if not os.path.exists("test"):  os.mkdir("test")
+                    with open(f'test/md_{filename.split("/")[-1].split(".")[0]}.json', 'w', encoding='utf-8') as f:
                         f.write(json.dumps([s for s in sections], indent=4, ensure_ascii=False))
-                        count += 1
                 else:
                     index_sections(os.path.basename(filename), sections)
